@@ -12,8 +12,12 @@ repositories {
 
 dependencies {
     // Apache Commons
-    compile 'org.apache.commons:commons-csv:1.5'    // CSV parser
-    compile 'org.apache.commons:commons-lang3:3.7'  // utility functions
+    compile 'org.apache.commons:commons-csv:1.5'            // CSV parser
+    compile 'org.apache.commons:commons-lang3:3.7'          // utility functions
+    compile 'org.apache.commons:commons-collections4:4.1'   // Collection utils
+
+    // Google Guava
+    compile 'com.google.guava:guava:24.1-jre'
 
     // JSoup for parsing HTML
     compile 'org.jsoup:jsoup:1.11.2'
