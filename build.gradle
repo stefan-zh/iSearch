@@ -10,16 +10,24 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    // Apache Commons
+    compile 'org.apache.commons:commons-csv:1.5'    // CSV parser
+    compile 'org.apache.commons:commons-lang3:3.7'  // utility functions
+
+    // JSoup for parsing HTML
+    compile 'org.jsoup:jsoup:1.11.2'
+
+    // JUnit 4
+    testCompile 'junit:junit:4.12'
+}
+
 //create a single Jar with all dependencies
-task fatJar(type: Jar) {
+jar {
     manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File Example',
-            'Implementation-Version': '1.0',
-            'Main-Class': 'com.isearch.app.App'
+        attributes 'Main-Class': 'com.isearch.app.App'
     }
-    baseName = project.name + '-all'
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    with jar
 }
