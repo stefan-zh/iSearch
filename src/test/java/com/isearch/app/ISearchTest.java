@@ -31,13 +31,13 @@ public class ISearchTest {
     }
 
     @Test
-    public void testLoadFile_NonExistantFile() {
+    public void testLoadFile_NonExistentFile() {
         // set up expectations
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("File 'non_existant.txt' does not exist");
+        thrown.expectMessage("File 'non_existent.txt' does not exist");
 
         // method under test
-        iSearch.loadFile("non_existant.txt");
+        iSearch.loadFile("non_existent.txt");
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ISearchTest {
 
         // assertions
         List<String> urls = iSearch.getUrls();
-        ImmutableList<String> expectedUrls = ImmutableList.of("http://google.com", "https://www.facebook.com");
+        ImmutableList<String> expectedUrls = ImmutableList.of("google.com", "https://www.facebook.com");
         assertTrue(CollectionUtils.isEqualCollection(expectedUrls, urls));
     }
 
