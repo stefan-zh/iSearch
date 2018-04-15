@@ -4,12 +4,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 class ISearch {
@@ -40,7 +39,6 @@ class ISearch {
             urls = csvParser.getRecords().stream()
                 .map(r -> r.get(URL_COLUMN))
                 .filter(StringUtils::isNotBlank)
-                .map(url -> url.matches("^htt(p|ps)://.*") ? url : "http://" + url)
                 .collect(Collectors.toList());
         } catch (IOException ex) {
             throw new RuntimeException(ex);
