@@ -6,9 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 class ISearch {
@@ -16,11 +18,9 @@ class ISearch {
     private static final String URL_COLUMN = "URL";
 
     private List<String> urls;
-    private BoundedHTTPRequester httpRequester;
 
     ISearch() {
         urls = Collections.emptyList();
-        httpRequester = new BoundedHTTPRequester();
     }
 
     /**
@@ -46,42 +46,33 @@ class ISearch {
         // don't need to close try-with-resource
     }
 
+    /**
+     * Searches for the search term on the list of URL's that are loaded in the class.
+     *
+     * @param searchTerm - a regular expression
+     */
     void search(String searchTerm) {
         if (StringUtils.isBlank(searchTerm)) {
             throw new IllegalArgumentException("The search string cannot be null or empty.");
         }
-        List<String> listUrls = new LinkedList<>();
-        ExecutorService executorService = new ThreadPoolExecutor(4, 20, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
-        List<Callable<String>> tasks = urls.stream()
+        // create the working queue with tasks
+        BlockingQueue<FutureTask<String>> workQueue = urls.stream()
             .map(url -> new ISearchTask(url, searchTerm))
-            .collect(Collectors.toList());
+            // wrap in a FutureTask, so that results can be collected on it
+            .map(FutureTask::new)
+            // place in a thread-safe queue
+            .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
-        try {
-            // launch task execution asynchronously
-            List<Future<String>> futures = executorService.invokeAll(tasks);
-            // collect future results
-            for (Future<String> future : futures) {
-                String url = future.get();
-                if (url != null) {
-                    listUrls.add(url);
-                }
-            }
-        } catch (InterruptedException | ExecutionException ex) {
-            // do nothing
-        }
+        // create concurrent http requester
+        ConcurrentHttpRequester<String> httpRequester = new ConcurrentHttpRequester<>(workQueue);
 
-        // close the executor service
-        // https://stackoverflow.com/a/1250655
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+        // the tasks will be executed asynchronously
+        List<String> listUrls = httpRequester.execute();
 
         // combine all URLs that passed into a string that will be written to a file
         String resultUrls = listUrls.stream()
+            .filter(Objects::nonNull)
             .collect(Collectors.joining(System.lineSeparator()));
 
         // write the results to a file
