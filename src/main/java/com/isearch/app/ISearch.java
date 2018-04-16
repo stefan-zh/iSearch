@@ -50,11 +50,46 @@ class ISearch {
         if (StringUtils.isBlank(searchTerm)) {
             throw new IllegalArgumentException("The search string cannot be null or empty.");
         }
-//        urls.stream()
-//            .map(url -> new ISearchTask(url, searchTerm))
-//            .map(task -> httpRequester.submit(task))
-//            .filter(Future::get)
-//            .collect()
+        List<String> listUrls = new LinkedList<>();
+        ExecutorService executorService = new ThreadPoolExecutor(4, 20, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
+        List<Callable<String>> tasks = urls.stream()
+            .map(url -> new ISearchTask(url, searchTerm))
+            .collect(Collectors.toList());
+
+        try {
+            // launch task execution asynchronously
+            List<Future<String>> futures = executorService.invokeAll(tasks);
+            // collect future results
+            for (Future<String> future : futures) {
+                String url = future.get();
+                if (url != null) {
+                    listUrls.add(url);
+                }
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            // do nothing
+        }
+
+        // close the executor service
+        // https://stackoverflow.com/a/1250655
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        // combine all URLs that passed into a string that will be written to a file
+        String resultUrls = listUrls.stream()
+            .collect(Collectors.joining(System.lineSeparator()));
+
+        // write the results to a file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("results.txt"))) {
+            writer.write(resultUrls);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
