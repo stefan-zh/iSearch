@@ -1,41 +1,41 @@
 # iSearch
 
-iSearch is a tool that can scan a number of web pages for a search term.
+iSearch is a multi-threaded concurrent tool that can scan a number of web pages for a search term.
 
-#### Requirements:
+### Requirements:
 You will need JRE 1.8 (but not JDK).
 
-#### Build
+### Build (if JDK installed)
 To build the project use:
 ```
-./gradlew clean compileJava jar
+./gradlew clean build
 ```
 
-#### Run
+### Run
 Once you are in the project root directory, you can execute the following command
 ```
-java -jar build/libs/isearch.jar urls.txt regex
+java -jar ./isearch.jar urls.txt regex
 ```
-where `regex` is a regular expression. For example,
+where `regex` is a case-insensitive regular expression. For example,
 ```
-java -jar build/libs/isearch.jar urls.txt test
+java -jar ./isearch.jar urls.txt test
 ```
 searches for the word `test` in the contents of all web pages provided in `urls.txt` while
 ```
-java -jar build/libs/isearch.jar urls.txt \\d{4}
+java -jar ./isearch.jar urls.txt \\d{4}
 ```
 will find those URLs that contain a word consisting of exactly 4 digits.
 
-#### Input
-The program expects a file `urls.txt` which is in CSV format. It needs to have a column titled "URL"
+### Input
+The program expects a file `urls.txt` in CSV format. The file needs to have a column "URL"
 under which there is a list of URLs. The rest of the contents of the file are ignored.
 
-#### Output
+### Output
 
-During execution you will see output similar to this:
+During execution you will see output that looks like this:
 
 ```
-21:20 $ java -jar build/libs/isearch.jar urls_50.txt "(http|https)"
+21:20 $ java -jar ./isearch.jar urls_50.txt "(http|https)"
 google.com/: 1715ms
 twitter.com/: 1793ms
 facebook.com/: 1922ms
@@ -47,11 +47,10 @@ linkedin.com/: 380ms
 ...
 8830
 ```
-The output shows each URL being processed and how long in milliseconds it took to process it. At the end 
-the number shows the total time in milliseconds that took the program to run.
+The output shows each URL being processed and how long it took in milliseconds to process it. The number
+at the end of the output shows the total time in milliseconds that the program took to run.
 
-Additionally, there will be a file called `results.txt` that will contain only those URLs that matched the
-regular expression.
+Additionally, a file `results.txt` is created that contains only those URLs that matched the regular expression.
 
 ```
 21:28 $ cat results.txt 

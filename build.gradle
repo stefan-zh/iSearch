@@ -26,7 +26,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-//create a single Jar with all dependencies
+// create a single Jar with all dependencies
 jar {
     manifest {
         attributes 'Main-Class': 'com.isearch.app.App'
@@ -35,3 +35,10 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+// copies the jar file to project root
+task copyJar(type: Copy) {
+    from jar // automatically takes the jar file produced from the jar task
+    into project.rootDir
+}
+build.dependsOn copyJar
