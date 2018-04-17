@@ -39,6 +39,7 @@ public class App {
         // write the results to a file
         BufferedWriter writer = new BufferedWriter(new FileWriter("results.txt"));
         writer.write(resultUrls);
+        writer.newLine();
         writer.close();
 
         // exit
