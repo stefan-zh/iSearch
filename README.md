@@ -25,6 +25,10 @@ searches for the word `test` in the contents of all web pages provided in `urls.
 java -jar ./isearch.jar urls.txt \\d{4}
 ```
 will find those URLs that contain a word consisting of exactly 4 digits.
+To run more complex `regex`es, use `""` around your expression:
+```
+java -jar ./isearch.jar src/test/resources/test_urls.txt "g(o)+gle"
+```
 
 ### Input
 The program expects a file `urls.txt` in CSV format. The file needs to have a column "URL"
