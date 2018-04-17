@@ -54,6 +54,17 @@ linkedin.com/: 380ms
 The output shows each URL being processed and how long it took in milliseconds to process it. The number
 at the end of the output shows the total time in milliseconds that the program took to run.
 
+Sometimes a certain web page might not be fetchable within `Jsoup`'s 30-second timeout
+window. This could be due to the host is not available or the page doesn't exist. In that case
+you will see output like this with the reason why the page was not fetched successfully.
+```
+dot.gov/: 1788ms
+desdev.cn/: did not complete due to java.net.SocketTimeoutException: connect timed out
+cisco.com/: 231ms
+japanpost.jp/: did not complete due to java.net.UnknownHostException: japanpost.jp
+admin.ch/: did not complete due to java.net.UnknownHostException: admin.ch
+```
+
 Additionally, a file `results.txt` is created that contains only those URLs that matched the regular expression.
 
 ```
