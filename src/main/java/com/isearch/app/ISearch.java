@@ -4,7 +4,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,9 +53,10 @@ class ISearch {
      * Searches for the search term on the list of URL's that are loaded in the class.
      *
      * @param searchTerm - a regular expression
+     * @return the list of URLs whose contents match the regular expression
      */
-    void search(String searchTerm) {
-        if (StringUtils.isBlank(searchTerm)) {
+    List<String> search(String searchTerm) {
+        if (StringUtils.isEmpty(searchTerm)) {
             throw new IllegalArgumentException("The search string cannot be null or empty.");
         }
 
@@ -70,17 +74,10 @@ class ISearch {
         // the tasks will be executed asynchronously
         List<String> listUrls = httpRequester.execute();
 
-        // combine all URLs that passed into a string that will be written to a file
-        String resultUrls = listUrls.stream()
-            .filter(Objects::nonNull)
-            .collect(Collectors.joining(System.lineSeparator()));
-
-        // write the results to a file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("results.txt"))) {
-            writer.write(resultUrls);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        // return the non-null urls
+        return listUrls.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
